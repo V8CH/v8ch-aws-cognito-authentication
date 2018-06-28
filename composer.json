@@ -1,0 +1,39 @@
+{
+	"autoload": {
+		"psr-4": {
+			"V8CH\\WordPress\\AWSCognitoAuthentication\\": [
+				"src/"
+			]
+		}
+	},
+	"description": "Authenticates against AWS Cognito.",
+	"homepage": "https://github.com/V8CH/aws-cognito-authentication",
+	"keywords": [
+		"authentication",
+		"aws",
+		"cognito",
+		"v8ch",
+		"wordpress",
+		"wp"
+	],
+	"license": "MIT",
+	"name": "v8ch/aws-cognito-authentication",
+	"require": {
+		"composer/installers": "~1.0",
+		"aws/aws-sdk-php": "^3.62",
+		"vlucas/phpdotenv": "^2.4"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.4.3",
+		"squizlabs/php_codesniffer": "^3.1",
+		"wimg/php-compatibility": "^8",
+		"wp-coding-standards/wpcs": "^0.14.0"
+	},
+	"scripts": {
+		"lint": "phpcs"
+	},
+	"support": {
+		"issues": "https://github.com/V8CH/aws-cognito-authentication/issues"
+	},
+	"type": "wordpress-plugin"
+}
