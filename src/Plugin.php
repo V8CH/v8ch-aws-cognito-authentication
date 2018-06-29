@@ -14,6 +14,9 @@ use Dotenv\Dotenv;
 use WP_Error;
 use WP_User;
 
+$dotenv = new Dotenv( __DIR__ . '/../' );
+$dotenv->load();
+
 /**
  * Core plugin class.
  *
@@ -55,8 +58,6 @@ class Plugin {
 	 * @since 0.0.1
 	 */
 	public function __construct() {
-		$dotenv = new Dotenv( __DIR__ . '/../' );
-		$dotenv->load();
 		$this->cognito_idp_client = new CognitoIdentityProviderClient(
 			[
 				'version'     => 'latest',
