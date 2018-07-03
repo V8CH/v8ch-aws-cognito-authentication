@@ -8,7 +8,7 @@
  * License URI: https://opensource.org/licenses/MIT
  * Plugin Name: V8CH AWS Cognito Authentication
  * Plugin URI:  https://github.com/V8CH/aws-cognito-authentication
- * Text Domain: plugin-name
+ * Text Domain: aws-cognito-authentication
  * Version:     0.0.1
  *
  * @category Authentication
@@ -26,24 +26,6 @@ require_once 'vendor/autoload.php';
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-if ( ! function_exists( 'write_log' ) ) {
-
-	/**
-	 * Outputs message to debug.log
-	 *
-	 * @param   array|object|string $log Object to log.
-	 * @return  void
-	 */
-	function write_log( $log ) {
-		if ( is_array( $log ) || is_object( $log ) ) {
-			error_log( print_r( $log, true ) );
-		} else {
-			error_log( $log );
-		}
-	}
-}
-
 
 define( 'V8CH_AWS_COGNITO_AUTHENTICATION_VERSION', '0.0.1' );
 

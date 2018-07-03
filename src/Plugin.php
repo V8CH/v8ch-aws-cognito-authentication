@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:ignore
 /**
  * File defines core plugin class.
  *
@@ -14,6 +14,9 @@ use Dotenv\Dotenv;
 use WP_Error;
 use WP_User;
 
+$dotenv = new Dotenv( __DIR__ . '/../' );
+$dotenv->load();
+
 /**
  * Core plugin class.
  *
@@ -21,6 +24,15 @@ use WP_User;
  * @since   0.0.1
  */
 class Plugin {
+
+	/**
+	 * AWS Cognito Identity Provider client.
+	 *
+	 * @access  protected
+	 * @since   0.0.1
+	 * @var     string $plugin_name The string used to uniquely identify this plugin.
+	 */
+	protected $cognito_idp_client;
 
 	/**
 	 * Unique identifier.
@@ -46,14 +58,22 @@ class Plugin {
 	 * @since 0.0.1
 	 */
 	public function __construct() {
+		$this->cognito_idp_client = new CognitoIdentityProviderClient(
+			[
+				'version'     => 'latest',
+				'region'      => 'us-east-2',
+				'credentials' => array(
+					'key'    => getenv( AWS_COGNITO_APP_CLIENT_KEY ),
+					'secret' => getenv( AWS_COGNITO_APP_CLIENT_SECRET ),
+				),
+			]
+		);
+		$this->plugin_name        = 'v8ch-aws-cognito-authentication';
 		if ( defined( 'V8CH_AWS_COGNITO_AUTHENTICATION_VERSION' ) ) {
 			$this->version = V8CH_AWS_COGNITO_AUTHENTICATION_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->plugin_name = 'v8ch-aws-cognito-authentication';
-		$dotenv            = new Dotenv( __DIR__ . '/../' );
-		$dotenv->load();
 
 	}
 
@@ -70,19 +90,8 @@ class Plugin {
 			return;
 		}
 
-		$cognito_identity_provider_client = new CognitoIdentityProviderClient(
-			[
-				'version'     => 'latest',
-				'region'      => 'us-east-2',
-				'credentials' => array(
-					'key'    => getenv( AWS_COGNITO_APP_CLIENT_KEY ),
-					'secret' => getenv( AWS_COGNITO_APP_CLIENT_SECRET ),
-				),
-			]
-		);
-
 		try {
-			$auth_result = $cognito_identity_provider_client->adminInitiateAuth(
+			$auth_result = $this->cognito_idp_client->adminInitiateAuth(
 				[
 					'AuthFlow'       => 'ADMIN_NO_SRP_AUTH',
 					'AuthParameters' => [
@@ -104,25 +113,15 @@ class Plugin {
 			}
 		}
 
-		$aws_cognito_user       = $cognito_identity_provider_client->getUser( [ 'AccessToken' => $auth_result->get( 'AuthenticationResult' )['AccessToken'] ] );
-		$aws_cognito_username   = $aws_cognito_user->get( 'Username' );
-		$aws_cognito_attributes = $aws_cognito_user->get( 'UserAttributes' );
+		$aws_cognito_user       = $this->cognito_idp_client->getUser(
+			[
+				'AccessToken' => $auth_result->get( 'AuthenticationResult' )['AccessToken'],
+			]
+		);
 
-		$userdata = WP_User::get_data_by( 'slug', $aws_cognito_username );
+		$userdata = WP_User::get_data_by( 'slug', $aws_cognito_user->get( 'Username' ) );
 
 		return new WP_User( $userdata->ID );
-	}
-
-
-
-	/**
-	 * Run the loader to execute all of the hooks with WordPress.
-	 *
-	 * @since   0.0.1
-	 */
-	public function run() {
-		add_filter( 'authenticate', array( $this, 'authenticate_with_aws_cognito' ), 10, 3 );
-		remove_action( 'authenticate', 'wp_authenticate_username_password', 20 );
 	}
 
 	/**
@@ -144,6 +143,16 @@ class Plugin {
 	 */
 	public function get_version() {
 		return $this->version;
+	}
+
+	/**
+	 * Set the hooks
+	 *
+	 * @since   0.0.1
+	 */
+	public function run() {
+		remove_action( 'authenticate', 'wp_authenticate_username_password', 20 );
+		add_filter( 'authenticate', array( $this, 'authenticate_with_aws_cognito' ), 40, 3 );
 	}
 
 }
