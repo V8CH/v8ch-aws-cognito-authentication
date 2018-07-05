@@ -8,6 +8,11 @@
 
 namespace V8CH\WordPress\AWSCognitoAuthentication;
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use Aws\CognitoIdentityProvider\CognitoIdentityProviderClient;
 use Aws\CognitoIdentityProvider\Exception\CognitoIdentityProviderException;
 use Dotenv\Dotenv;
