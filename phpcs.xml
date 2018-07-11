@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ruleset name="V8CH">
+  <description>V8CH Coding Standards</description>
+
+  <!-- Scan these files -->
+  <file>src</file>
+  <file>v8ch-aws-cognito-authentication.php</file>
+
+  <!-- Show colors in console -->
+  <arg value="-colors"/>
+
+  <!-- Show sniff codes in all reports -->
+  <arg value="s"/>
+
+  <!-- Use PSR-2 as a base -->
+  <rule ref="PSR2"/>
+</ruleset>
